@@ -14,6 +14,7 @@ export async function POST(_request: NextRequest) {
 
   try {
     const result = await callRefresh(currentRefreshToken);
+    const expiresIn = result.expires_in ?? 900;
 
     const response = NextResponse.json({ success: true });
 
@@ -22,7 +23,7 @@ export async function POST(_request: NextRequest) {
       secure: IS_PROD,
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 15,
+      maxAge: expiresIn,
     });
 
     if (result.refresh_token) {

@@ -117,6 +117,7 @@ export async function exportProfiles(
 export async function refreshToken(currentRefreshToken: string): Promise<{
   access_token: string;
   refresh_token?: string;
+  expires_in?: number;
 }> {
   const res = await fetch(`${API_BASE}/api/v1/auth/refresh`, {
     method: 'POST',
@@ -129,5 +130,7 @@ export async function refreshToken(currentRefreshToken: string): Promise<{
     throw new Error(`Refresh failed: ${res.status}`);
   }
 
-  return res.json() as Promise<{ access_token: string; refresh_token?: string }>;
+  // Backend returns { status: 'success', data: { access_token, refresh_token, token_type, expires_in } }
+  const json = await res.json() as { status: string; data: { access_token: string; refresh_token?: string; expires_in?: number } };
+  return json.data;
 }
